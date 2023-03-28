@@ -38,6 +38,10 @@ class ImportProducts extends Command
 
         foreach ($lines as $line) {
 
+            if (trim($line) == "id,name,sku,price,currency,variations,quantity,status") {
+                continue;
+            }
+
             $fields = explode(';', $line);
 
             $pdo = new PDO('mysql:dbname=coding_challenge;host=127.0.0.1;port=3306', 'root', '');
