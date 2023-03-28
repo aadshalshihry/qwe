@@ -40,7 +40,7 @@ class ImportProducts extends Command
 
             $fields = explode(';', $line);
 
-            $pdo = new PDO('mysql:dbname=coding_challenge;host=127.0.0.1;port=3306', 'root', '');
+            $pdo = new PDO('mysql:dbname=coding_challenge;host=127.0.0.1;port=3306', 'root', 'secret');
 
             $query = $pdo->prepare("SELECT COUNT(*) AS c from products WHERE id=?");
             $result = $query->execute([$fields[0]]);
