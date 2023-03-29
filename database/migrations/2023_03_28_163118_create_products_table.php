@@ -26,14 +26,14 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 255)->nullable();
-            $table->string('sku', 255)->unique()->nullable();
-            $table->string('status', 255)->default(0);
-            $table->text('variations', 255)->nullable();
+            $table->string('name')->nullable();
+            $table->string('sku')->unique()->nullable();
+            $table->string('status')->default(0);
+            $table->text('variations')->nullable();
             $table->decimal('price', 15, 2)->nullable();
             $table->string('currency', 20)->nullable();
             $table->unsignedBigInteger('quantity')->default(0);
-            $table->boolean('deleted')->default(false);
+            $table->string('deleted_hint')->nullable()->comment("This is a hint for the deleted record");
             $table->timestamps();
             $table->softDeletes();
         });

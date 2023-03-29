@@ -11,11 +11,11 @@ class Product extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        "id", "name", "sku", "price", "currency", "variations", "quantity", "status"
+        "id", "name", "sku", "price", "currency", "variations", "quantity", "status", 'deleted'
     ];
 
-    // protected $casts = [
-    //     'status' => ProductStatusEnum::class
-    // ];
+    protected $casts = [
+        'status' => ProductStatusEnum::class
+    ];
 
 }
