@@ -26,16 +26,17 @@ class ProductsImport implements ToModel, WithValidation, WithProgressBar, WithUp
      */
     public function model(array $row)
     {
-        return new Product([
-            'id' => $row['id'],
-            'name' => $row['name'],
-            'sku' => $row['sku'],
-            'price' => $row['price'],
-            'currency' => $row['currency'],
-            'variations' => $row['variations'],
-            'quantity' => !empty($row['quantity']) and isset($row['quantity']) ? $row['quantity'] : 0,
-            'status' => $row['status']
-        ]);
+        return Product::updateOrCreate([
+                'id' => $row['id'],
+            ],[
+                'name' => $row['name'],
+                'sku' => $row['sku'],
+                'price' => $row['price'],
+                'currency' => $row['currency'],
+                'variations' => $row['variations'],
+                'quantity' => !empty($row['quantity']) and isset($row['quantity']) ? $row['quantity'] : 0,
+                'status' => $row['status']
+            ]);
     }
 
     

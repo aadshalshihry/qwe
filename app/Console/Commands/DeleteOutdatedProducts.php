@@ -3,9 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Enum\ProductStatusEnum;
-use App\Repositories\ProductRepositoryInterface;
+use App\Models\Product;
 use Illuminate\Console\Command;
-use League\Csv\Reader;
+use Illuminate\Support\Facades\Storage;
+use App\Repositories\ProductRepositoryInterface;
+use Exception;
 
 class DeleteOutdatedProducts extends Command
 {
@@ -23,7 +25,7 @@ class DeleteOutdatedProducts extends Command
      *
      * @var string
      */
-    protected $signature = 'app:delete-outdated-products';
+    protected $signature = 'app:delete-outdated-products {fileName}';
 
     /**
      * The console command description.
@@ -37,10 +39,26 @@ class DeleteOutdatedProducts extends Command
      */
     public function handle(): void
     {
-        $contents = file_get_contents('products2.csv');
-        $lines = explode("\n", $contents);
+        $fileName = $this->getCmdArgs();
+
+        try {
+            $contents = file_get_contents($fileName);
+            $lines = explode("\n", $contents);
+        } catch(Exception $e) {
+            $this->error('Uncorrect File Name!');
+            die();
+        }
 
         $numberOfDeletedProduct = 0;
+        $productsExistInFile = [];
+        $jsonFilePath = 'public/uploads/productsExistInFile.json';
+        if (Storage::exists($jsonFilePath)) {
+            Storage::delete($jsonFilePath);
+        }
+
+        $this->info('Starting Deleting records with status deleted....');
+
+        $bar = $this->output->createProgressBar(count($lines));
         foreach ($lines as $key => $line) {
             // Skip the header from the iteration
             if($key == 0) continue;
@@ -53,16 +71,39 @@ class DeleteOutdatedProducts extends Command
 
 
             $existProduct = $this->productRepository->find($row_data[0]);
-            if($existProduct and $existProduct->status == ProductStatusEnum::DELETED) {
-                $existProduct->hint = "The product was deleted because of the synchronization process.";
-                $existProduct->save();
-                $existProduct->delete();
-                $numberOfDeletedProduct++;
-            } else {
-
+            if($existProduct) {
+                $productsExistInFile[] = $row_data[0];
+                if($existProduct->status == ProductStatusEnum::DELETED) {
+                    $existProduct->deleted_hint = "The product was deleted because of the synchronization process.";
+                    $existProduct->save();
+                    $existProduct->delete();
+                    $numberOfDeletedProduct++;
+                }
             }
-            die();
+            $bar->advance();
         }
+        $bar->finish();
 
+        $this->newLine();
+        $this->info('Starting Deleting not existed records form the database....');
+        $bar = $this->output->createProgressBar(count($productsExistInFile));
+        $records = Product::whereNotIn('id', $productsExistInFile)->get();
+        foreach ($records as $record) {
+            if (!in_array($record->id, $productsExistInFile)) {
+                $record->deleted_hint = "The product was deleted because of the synchronization process.";
+                $record->save();
+                $record->delete();
+                $numberOfDeletedProduct++;
+            }
+            $bar->advance();
+        }
+        $bar->finish();
+
+        $this->newLine();
+        $this->info('Deleted ' . $numberOfDeletedProduct . ' products.');
+    }
+
+    private function getCmdArgs():string {
+        return $this->argument('fileName') ?? 'products.csv';
     }
 }
