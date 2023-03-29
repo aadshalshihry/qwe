@@ -1,0 +1,9 @@
+<?php
+namespace App\Enum;
+
+
+enum ProductStatusEnum:string
+{
+    case SALE = "sale";
+    case HIDDEN = "hidden";
+}
