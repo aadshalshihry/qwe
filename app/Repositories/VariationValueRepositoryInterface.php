@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-interface ProductRepositoryInterface
+interface VariationValueRepositoryInterface
 {
     public function all();
     public function get($where = [], $with = []);

@@ -10,7 +10,16 @@ class Variation extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name'
+    ];
+
     public function productVariation(): HasMany {
         return $this->hasMany(ProductVariation::class);
+    }
+
+    public function varitionValues(): HasMany
+    {
+        return $this->hasMany(VariationValues::class);
     }
 }

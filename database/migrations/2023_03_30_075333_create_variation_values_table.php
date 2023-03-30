@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Variation;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,10 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // ToDO: Add dynamic tanslations to variations
-        Schema::create('variations', function (Blueprint $table) {
+        Schema::create('variation_values', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('value');
+            $table->foreignIdFor(Variation::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('variations');
+        Schema::dropIfExists('variation_values');
     }
 };

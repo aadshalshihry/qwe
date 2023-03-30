@@ -2,18 +2,18 @@
 
 namespace App\Repositories;
 
-use App\Models\Product;
+use App\Models\VariationValues;
 
-class ProductRepository implements ProductRepositoryInterface
+class VariationValueRepository implements VariationValueRepositoryInterface
 {
     public function all()
     {
-        return Product::all();
+        return VariationValues::all();
     }
 
     public function get($where = [], $with = [])
     {
-        $query = Product::query();
+        $query = VariationValues::query();
         if (!empty($where)) {
             $query = $query->where($where);
         }
@@ -27,13 +27,12 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function find($id)
     {
-        return Product::find($id);
+        return VariationValues::find($id);
     }
 
-    public function first($where = [], $with = [])
-    {
-        $query = Product::query();
-        if (!empty($where)) {
+    public function first($where = [], $with = []) {
+        $query = VariationValues::query();
+        if(!empty($where)) {
             $query = $query->where($where);
         }
 
@@ -46,33 +45,33 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function create(array $attributes)
     {
-        return Product::create($attributes);
+        return VariationValues::create($attributes);
     }
 
     public function update($id, array $attributes)
     {
-        $product = Product::findOrFail($id);
+        $variation = VariationValues::findOrFail($id);
 
-        $product->update($attributes);
+        $variation->update($attributes);
 
-        return $product;
+        return $variation;
     }
 
     public function firstOrCreate($id, array $attributes)
     {
-        if ($variation = Product::find($id)) {
+        if($variation = VariationValues::find($id)) {
             return $variation;
         }
-
-        $variation = Product::create($attributes);
+        
+        $variation = VariationValues::create($attributes);
         return $variation;
     }
 
     public function delete($id)
     {
-        $product = Product::findOrFail($id);
+        $variation = VariationValues::findOrFail($id);
 
-        $product->delete();
+        $variation->delete();
 
         return true;
     }

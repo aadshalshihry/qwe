@@ -2,18 +2,18 @@
 
 namespace App\Repositories;
 
-use App\Models\Product;
+use App\Models\ProductVariation;
 
-class ProductRepository implements ProductRepositoryInterface
+class ProductVariationRepository implements ProductVariationRepositoryInterface
 {
     public function all()
     {
-        return Product::all();
+        return ProductVariation::all();
     }
 
     public function get($where = [], $with = [])
     {
-        $query = Product::query();
+        $query = ProductVariation::query();
         if (!empty($where)) {
             $query = $query->where($where);
         }
@@ -27,12 +27,12 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function find($id)
     {
-        return Product::find($id);
+        return ProductVariation::find($id);
     }
 
     public function first($where = [], $with = [])
     {
-        $query = Product::query();
+        $query = ProductVariation::query();
         if (!empty($where)) {
             $query = $query->where($where);
         }
@@ -46,12 +46,12 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function create(array $attributes)
     {
-        return Product::create($attributes);
+        return ProductVariation::create($attributes);
     }
 
     public function update($id, array $attributes)
     {
-        $product = Product::findOrFail($id);
+        $product = ProductVariation::findOrFail($id);
 
         $product->update($attributes);
 
@@ -60,17 +60,17 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function firstOrCreate($id, array $attributes)
     {
-        if ($variation = Product::find($id)) {
+        if ($variation = ProductVariation::find($id)) {
             return $variation;
         }
 
-        $variation = Product::create($attributes);
+        $variation = ProductVariation::create($attributes);
         return $variation;
     }
 
     public function delete($id)
     {
-        $product = Product::findOrFail($id);
+        $product = ProductVariation::findOrFail($id);
 
         $product->delete();
 

@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\Product;
 use App\Models\Variation;
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use App\Models\VariationValues;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -16,9 +18,10 @@ return new class extends Migration
             $table->id();
             $table->decimal('additional_price', 15, 2)->nullable();
             $table->unsignedBigInteger('quantity')->default(0);
-            $table->foreignIdFor(Product::class)->constrained()->onDelete();
-            $table->foreignIdFor(Variation::class)->constrained()->onDelete();
-            $table->timestamps();
+
+            $table->foreignIdFor(Product::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Variation::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(VariationValues::class)->constrained()->cascadeOnDelete();
         });
     }
 
