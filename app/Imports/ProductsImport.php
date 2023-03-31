@@ -1,12 +1,14 @@
 <?php
 namespace App\Imports;
 
+use App\Enum\ProductStatusEnum;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Models\Variation;
 use App\Models\VariationValues;
-use App\Rules\InputNotNullable;
 use App\Rules\SKUValidator;
+use App\Services\VariationService;
+use Illuminate\Validation\Rules\Enum;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
@@ -30,7 +32,7 @@ class ProductsImport implements ToModel, WithValidation, WithProgressBar, WithUp
     public function model(array $row)
     {
 
-        $product = Product::find($row['id']);
+        $product = Product::where('id', $row['id'])->orWhere('sku', $row['sku'])->first();
 
         if($product) {
             $product->name = $row['name'];
@@ -40,50 +42,7 @@ class ProductsImport implements ToModel, WithValidation, WithProgressBar, WithUp
             $product->status = $row['status'];
             $product->save();
 
-            $variations = json_decode($row['variations']);
-            info($variations);
-            if($variations) {
-                foreach($variations as $variation) {
-                    $variationRecord = Variation::where('name', $variation['name'])
-                        ->first();
-                    $variationValueRecord = VariationValues::where('value', $variation['value'])
-                        ->first();
-                    $productVarition = ProductVariation::with('variationValue')
-                        ->where('product_id', $row['id'])
-                        ->where('varition_id', $variationRecord->id)
-                        ->where('variation_values_id', $variationValueRecord->id)
-                        ->first();
-
-                    if($productVarition) {
-                        $productVarition->additional_price = $row['price'];
-                        $productVarition->quantity = !empty($row['quantity']) and isset($row['quantity']) ? $row['quantity'] : 0;
-                        if($productVarition->variationValue->value != $variationValueRecord->value) {
-                            $productVarition->variation_values_id = $productVarition->variationValue->id;
-                        }
-                        $productVarition->save();
-                    } else {
-                        if(!$variationRecord) {
-                            $variationRecord = Variation::create([
-                                'name' => $variation['name']
-                            ]);
-                        }
-
-                        if(!$variationValueRecord) {
-                            $variationValueRecord = VariationValues::create([
-                                'value' => $variation['value'],
-                                'variation_id' => $variationRecord->id
-                            ]);
-                        }
-                        $productVarition = ProductVariation::create([
-                            'additional_price' => $row['price'],
-                            'quantity' => !empty($row['quantity']) and isset($row['quantity']) ? $row['quantity'] : 0,
-                            'product_id' => $product->id,
-                            'variation_id' => $variationRecord->id,
-                            'variation_values_id' => $variationValueRecord->id
-                        ]);
-                    }
-                }
-            }
+            (new VariationService())->createOrUpdate($product, $row);
         } else {
             $product = Product::create([
                 'id' => $row['id'],
@@ -95,6 +54,8 @@ class ProductsImport implements ToModel, WithValidation, WithProgressBar, WithUp
                 // 'quantity' => !empty($row['quantity']) and isset($row['quantity']) ? $row['quantity'] : 0,
                 'status' => $row['status']
             ]);
+
+            (new VariationService())->createOrUpdate($product, $row);
 
         }
         return $product;
@@ -118,8 +79,9 @@ class ProductsImport implements ToModel, WithValidation, WithProgressBar, WithUp
                     $onFailure('Name is required!');
                 }
             },
-            'sku' => ['required'],
-            'price' => ['numeric']
+            'sku' => ['required', new SKUValidator()],
+            'price' => ['numeric'],
+            'status' => [new Enum(ProductStatusEnum::class)]
         ];
     }
 

@@ -12,7 +12,7 @@ class ImportProductsWithProgressBar extends Command
     /**
      * @var string
      */
-    protected $signature = 'import:productsPB';
+    protected $signature = 'import:productsPB {fileName?}';
 
     /**
      * @var string
@@ -32,11 +32,12 @@ class ImportProductsWithProgressBar extends Command
      */
     public function handle()
     {
+        $fileName = $this->getCmdArgs();
+
         $import = new ProductsImport();
 
-        // (new ProductsImport)->import(base_path('products2.csv'), null, \Maatwebsite\Excel\Excel::CSV);
         $this->output->title('Starting import products');
-        $import->withOutput($this->output)->import('products.csv', null, \Maatwebsite\Excel\Excel::CSV);
+        $import->withOutput($this->output)->import($fileName, null, \Maatwebsite\Excel\Excel::CSV);
         $this->output->success('Import successful');
 
         info("Failed to import products");
@@ -48,5 +49,10 @@ class ImportProductsWithProgressBar extends Command
             $failure->errors(); // Actual error messages from Laravel validator
             $failure->values(); // The values of the row that has failed.
         }
+    }
+
+    private function getCmdArgs(): string
+    {
+        return $this->argument('fileName') ?? 'products.csv';
     }
 }

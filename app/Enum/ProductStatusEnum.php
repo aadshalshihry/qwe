@@ -8,4 +8,5 @@ enum ProductStatusEnum:string
     case HIDDEN = "hidden";
     case DELETED = "deleted";
     case OUT = "out";
+    case NONE = "none";
 }
