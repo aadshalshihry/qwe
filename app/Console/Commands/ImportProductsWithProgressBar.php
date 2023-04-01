@@ -39,9 +39,6 @@ class ImportProductsWithProgressBar extends Command
         $this->output->title('Starting import products');
         $import->withOutput($this->output)->import($fileName, null, \Maatwebsite\Excel\Excel::CSV);
         $this->output->success('Import successful');
-
-        info("Failed to import products");
-        $import->failures();
         
         foreach ($import->failures() as $failure) {
             $failure->row(); // row that went wrong

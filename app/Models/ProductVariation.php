@@ -11,7 +11,7 @@ class ProductVariation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'additional_price', 'quantity', 'product_id', 'variation_id'
+        'additional_price', 'quantity', 'product_id', 'variation_id', 'variation_values_id'
     ];
 
     public function product(): BelongsTo {
@@ -24,6 +24,6 @@ class ProductVariation extends Model
 
     public function variationValue(): BelongsTo
     {
-        return $this->belongsTo(VariationValues::class)->withDefault();
+        return $this->belongsTo(VariationValues::class, 'variation_values_id')->withDefault();
     }
 }

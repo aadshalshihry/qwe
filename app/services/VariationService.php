@@ -28,53 +28,56 @@ class VariationService {
         $this->productVariationRepositoryInterface = new ProductVariationRepository();
     }
 
-    public function createOrUpdate($product, $row) {
-        $variations = json_decode($row['variations']);
-        info($variations);
-        if ($variations) {
-            foreach ($variations as $variation) {
-                // $variationRecord = Variation::where('name', $variation['name'])
-                //     ->first();
+    public function createOrUpdate($product, $variations, $price, $quantity) {
 
-                $variationRecord = $this->variationRepositoryInterface->first(['name' => $variation['name']]);
-                // $variationValueRecord = VariationValues::where('value', $variation['value'])
-                //     ->first();
-                $variationValueRecord = $this->variationValueRepositoryInterface->first(['value' => $variation['value']]);
+        foreach ($variations as $key => $variation) {
+            if (empty($variation->name) or empty($variation->value)) {
+                continue;
+            }
 
-                // $productVarition = ProductVariation::with('variationValue')
-                // ->where('product_id', $row['id'])
-                //     ->where('varition_id', $variationRecord->id)
-                //     ->where('variation_values_id', $variationValueRecord->id)
-                //     ->first();
-                $productVarition = $this->productVariationRepositoryInterface->first([
-                    ['product_id', '=', $row['id']],
-                    ['varition_id', '=', $variationRecord->id],
+            $variationRecord = $this->variationRepositoryInterface->first(['name' => $variation->name]);
+            $variationValueRecord = $this->variationValueRepositoryInterface->first(['value' => $variation->value]);
+
+            $productVariation = null;
+            if ($variationRecord and $variationValueRecord) {
+                $productVariation = $this->productVariationRepositoryInterface->first([
+                    ['product_id', '=', $product->id],
+                    ['variation_id', '=', $variationRecord->id],
                     ['variation_values_id', '=', $variationValueRecord->id],
-                ]);
+                ], ['variationValue']);
+            }
 
-                if ($productVarition) {
-                    $productVarition->additional_price = $row['price'];
-                    $productVarition->quantity = !empty($row['quantity']) and isset($row['quantity']) ? $row['quantity'] : 0;
-                    if ($productVarition->variationValue->value != $variationValueRecord->value) {
-                        $productVarition->variation_values_id = $productVarition->variationValue->id;
-                    }
-                    $productVarition->save();
+            if (!empty($productVariation)) {
+                if($key == 1) {
+                    $productVariation->additional_price = 0;
                 } else {
-                    if (!$variationRecord) {
-                        $variationRecord = $this->variationRepositoryInterface->create([
-                            'name' => $variation['name']
-                        ]);
-                    }
+                    $productVariation->additional_price = $price;
+                }
+                
+                $productVariation->quantity = $quantity;
 
-                    if (!$variationValueRecord) {
-                        $variationValueRecord = $this->variationValueRepositoryInterface->create([
-                            'value' => $variation['value'],
-                            'variation_id' => $variationRecord->id
-                        ]);
-                    }
-                    $productVarition = $this->productVariationRepositoryInterface->create([
-                        'additional_price' => $row['price'],
-                        'quantity' => !empty($row['quantity']) and isset($row['quantity']) ? $row['quantity'] : 0,
+                if ($productVariation->variationValue->value != $variationValueRecord->value) {
+                    $productVariation->variation_values_id = $productVariation->variationValue->id;
+                }
+                $productVariation->save();
+            } else {
+                if (!$variationRecord) {
+                    $variationRecord = $this->variationRepositoryInterface->create([
+                        'name' => $variation->name
+                    ]);
+                }
+
+                if (!$variationValueRecord) {
+                    $variationValueRecord = $this->variationValueRepositoryInterface->create([
+                        'value' => $variation->value,
+                        'variation_id' => $variationRecord->id
+                    ]);
+                }
+                if ($variationRecord and $variationValueRecord) {
+
+                    $productVariation = $this->productVariationRepositoryInterface->create([
+                        'additional_price' => $price,
+                        'quantity' => $quantity,
                         'product_id' => $product->id,
                         'variation_id' => $variationRecord->id,
                         'variation_values_id' => $variationValueRecord->id

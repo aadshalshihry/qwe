@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Models\Variation;
 use App\Models\VariationValues;
+use App\Rules\NotNullValidator;
 use App\Rules\SKUValidator;
 use App\Services\VariationService;
 use Illuminate\Validation\Rules\Enum;
@@ -31,32 +32,43 @@ class ProductsImport implements ToModel, WithValidation, WithProgressBar, WithUp
      */
     public function model(array $row)
     {
+        $variations = null;
 
-        $product = Product::where('id', $row['id'])->orWhere('sku', $row['sku'])->first();
+        $product = Product::where('sku', $row['sku'])->first();
 
+        if (array_key_exists('variations', $row)) {
+            $variationsJson = json_decode($row['variations']);
+            if(!empty($variationsJson)) 
+                $variations = $variationsJson;
+        }
+        
         if($product) {
             $product->name = $row['name'];
             $product->price = $row['price'];
             $product->currency = $row['currency'];
-            // $product->quantity = !empty($row['quantity']) and isset($row['quantity']) ? $row['quantity'] : 0;
             $product->status = $row['status'];
+            $product->variations = $row['variations'];
             $product->save();
 
-            (new VariationService())->createOrUpdate($product, $row);
+            if (!empty($variations)) {
+                (new VariationService())->createOrUpdate($product, $variations, $row['price'], $row['quantity']);
+            }
+            
         } else {
-            $product = Product::create([
+
+            $data = [
                 'id' => $row['id'],
                 'name' => $row['name'],
                 'sku' => $row['sku'],
                 'price' => $row['price'],
                 'currency' => $row['currency'],
-                // 'variations' => $row['variations'],
-                // 'quantity' => !empty($row['quantity']) and isset($row['quantity']) ? $row['quantity'] : 0,
                 'status' => $row['status']
-            ]);
+            ];
 
-            (new VariationService())->createOrUpdate($product, $row);
-
+            $product = Product::create($data);
+            if (!empty($variations)) {
+                (new VariationService())->createOrUpdate($product, $variations, $row['price'], $row['quantity']);
+            }
         }
         return $product;
     }
@@ -80,7 +92,8 @@ class ProductsImport implements ToModel, WithValidation, WithProgressBar, WithUp
                 }
             },
             'sku' => ['required', new SKUValidator()],
-            'price' => ['numeric'],
+            'price' => ['numeric', New NotNullValidator()],
+            'quantity' => ['numeric', New NotNullValidator()],
             'status' => [new Enum(ProductStatusEnum::class)]
         ];
     }
@@ -91,6 +104,7 @@ class ProductsImport implements ToModel, WithValidation, WithProgressBar, WithUp
     public function onFailure(Failure ...$failures)
     {
         // Handle the failures how you'd like.
+        // info($failures);
     }
 
     public function chunkSize(): int

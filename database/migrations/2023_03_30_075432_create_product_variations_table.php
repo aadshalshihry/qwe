@@ -22,6 +22,8 @@ return new class extends Migration
             $table->foreignIdFor(Product::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Variation::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(VariationValues::class)->constrained()->cascadeOnDelete();
+
+            $table->timestamps();
         });
     }
 
