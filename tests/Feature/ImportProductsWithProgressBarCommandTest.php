@@ -23,8 +23,8 @@ class ImportProductsWithProgressBarCommandTest extends TestCase
             [5, 'product5', 'sku5', 5, null, null, 1, 'sale'], // Currency Null
             [6, 'product6', 'sku6', 6, "SAR", null, null, 'sale'], // Price Null
             [7, 'product7', 'sku7', 7, "SAR", null, "null", 'sale'], // Price Null
-            [7, null, null, null, null, null, null, null],
-            [7, null, null, null, null, null, null, null],
+            [8, null, null, null, null, null, null, null], // all Null
+            [9, 'product9', 'سكيو', '10.00', 'SAR', '[{"name":"variation1","value":"value1"}]', 10, 'sale'], // Null Valide SKU
         ];
         $fp = fopen($csvFile, 'w');
         foreach ($csvData as $fields) {
@@ -94,6 +94,16 @@ class ImportProductsWithProgressBarCommandTest extends TestCase
             'name' => 'product6',
             'sku' => 'sku6',
             'price' => null,
+            'currency' => 'SAR',
+            'status' => 'sale'
+        ]);
+
+        // Null Valide SKU
+        $this->assertDatabaseMissing('products', [
+            'id' => 9,
+            'name' => 'product9',
+            'sku' => 'sku9',
+            'price' => '10.00',
             'currency' => 'SAR',
             'status' => 'sale'
         ]);

@@ -20,11 +20,6 @@ class Product extends Model
         'status' => ProductStatusEnum::class
     ];
 
-    public static function boot()
-    {
-        parent::boot();
-    }
-
     public function productVariation(): HasMany
     {
         return $this->hasMany(ProductVariation::class);
