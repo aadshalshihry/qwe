@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Models\Variation;
+use App\Notifications\WarehouseUpdateQuantityNotificatoin;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
@@ -55,6 +56,23 @@ class ImportProductExternalApi extends Command
                                     $productVariation->save();
                                     // log record update successful
                                     // send notification
+                                    /*
+                                        // Send notification to warehouse
+                                        $userFromWarehouse->notify(new WarehouseUpdateQuantityNotificatoin(
+                                            $product->name,
+                                            $productVariation->quantity)
+                                        );
+
+                                        // Send notification to users who want to know when the product become availbale
+                                        $usersWantToKnowTheOutOfStockProductBecomeAvailbale
+                                            ->notify(new ProductBecomeAvailableAfterOutOfStockNotificatoin(
+                                            $product->name)
+                                        );
+
+                                        // Send a request to 3rd party application
+                                        dispatch(new SendRequestTo3rdPartyJob($product));
+                                    */
+                                    
                                 } else {
                                     // save a log of the product variation does not exists
                                 }
