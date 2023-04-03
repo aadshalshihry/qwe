@@ -41,6 +41,7 @@ class ImportProductsWithProgressBar extends Command
         $this->output->success('Import successful');
         
         foreach ($import->failures() as $failure) {
+            // LOG: all failuers
             $failure->row(); // row that went wrong
             $failure->attribute(); // either heading key (if using heading row concern) or column index
             $failure->errors(); // Actual error messages from Laravel validator

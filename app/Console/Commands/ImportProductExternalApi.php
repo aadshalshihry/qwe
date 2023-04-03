@@ -47,14 +47,17 @@ class ImportProductExternalApi extends Command
                         foreach($product['variations'] as $variation) {
                             // Assumation: the name is exactly the same
                             $colorVariation = $this->getVariationRecord('color', $variation['color']);
-                            $materialVariation = $this->getVariationRecord('material', $variation['material']);
+
+                            // Note: Need to create a pivet table between product_variations and variation
+                            //       to hanle the association of price, and quantity to muiltple variations
+                            // $materialVariation = $this->getVariationRecord('material', $variation['material']);
                             if($colorVariation) {
                                 $productVariation = ProductVariation::where('variation_id', $colorVariation->id)->first();
                                 if($productVariation) {
                                     $productVariation->quantity = $variation['quantity'];
                                     $productVariation->additional_price = $variation['additional_price'];
                                     $productVariation->save();
-                                    // log record update successful
+                                    // LOG: record update successful
                                     // send notification
                                     /*
                                         // Send notification to warehouse
@@ -74,10 +77,10 @@ class ImportProductExternalApi extends Command
                                     */
                                     
                                 } else {
-                                    // save a log of the product variation does not exists
+                                    // LOG: save a log of the product variation does not exists
                                 }
                             } else {
-                                // save a log of the variation does not exists
+                                // LOG: save a log of the variation does not exists
                             }
                         }
                     }
