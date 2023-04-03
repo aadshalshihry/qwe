@@ -17,7 +17,7 @@ class ImportProductsWithProgressBar extends Command
     /**
      * @var string
      */
-    protected $description = 'Imports products into database';
+    protected $description = 'Imports products into database with validation and progress bar';
 
     /**
      * @return void

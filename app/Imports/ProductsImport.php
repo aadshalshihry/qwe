@@ -8,6 +8,7 @@ use App\Models\Variation;
 use App\Models\VariationValues;
 use App\Rules\NotNullValidator;
 use App\Rules\SKUValidator;
+use App\Services\ProductService;
 use App\Services\VariationService;
 use Illuminate\Validation\Rules\Enum;
 use Maatwebsite\Excel\Concerns\Importable;
@@ -32,45 +33,7 @@ class ProductsImport implements ToModel, WithValidation, WithProgressBar, WithUp
      */
     public function model(array $row)
     {
-        $variations = null;
-
-        $product = Product::where('sku', $row['sku'])->first();
-
-        if (array_key_exists('variations', $row)) {
-            $variationsJson = json_decode($row['variations']);
-            if(!empty($variationsJson)) 
-                $variations = $variationsJson;
-        }
-        
-        if($product) {
-            $product->name = $row['name'];
-            $product->price = $row['price'];
-            $product->currency = $row['currency'];
-            $product->status = $row['status'];
-            $product->variations = $row['variations'];
-            $product->save();
-
-            if (!empty($variations)) {
-                (new VariationService())->createOrUpdate($product, $variations, $row['price'], $row['quantity']);
-            }
-            
-        } else {
-
-            $data = [
-                'id' => $row['id'],
-                'name' => $row['name'],
-                'sku' => $row['sku'],
-                'price' => $row['price'],
-                'currency' => $row['currency'],
-                'status' => $row['status']
-            ];
-
-            $product = Product::create($data);
-            if (!empty($variations)) {
-                (new VariationService())->createOrUpdate($product, $variations, $row['price'], $row['quantity']);
-            }
-        }
-        return $product;
+        return (new ProductService())->createOrUpdate($row);
     }
 
     

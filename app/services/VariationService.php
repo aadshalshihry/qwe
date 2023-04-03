@@ -29,7 +29,7 @@ class VariationService {
     }
 
     public function createOrUpdate($product, $variations, $price, $quantity) {
-
+        info($product);
         foreach ($variations as $key => $variation) {
             if (empty($variation->name) or empty($variation->value)) {
                 continue;
