@@ -16,7 +16,6 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        ImportProducts::class,
         ImportProductsWithProgressBar::class,
         DeleteOutdatedProducts::class,
     ];

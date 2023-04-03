@@ -24,7 +24,8 @@ class ProductService {
         $variations = null;
 
         $product = $this->productRepositoryInterface->first(['sku' => $row['sku']]);
-
+        
+        
         if (array_key_exists('variations', $row)) {
             $variationsJson = json_decode($row['variations']);
             if (!empty($variationsJson))
@@ -36,7 +37,6 @@ class ProductService {
             $product->price = $row['price'];
             $product->currency = $row['currency'];
             $product->status = $row['status'];
-            // $product->variations = $row['variations'];
             $product->save();
 
             if (!empty($variations)) {
