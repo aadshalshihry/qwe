@@ -13,11 +13,11 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('sku')->unique()->nullable();
             $table->string('status')->default(0);
-            // $table->text('variations')->nullable();
             $table->decimal('price', 15, 2)->nullable();
             $table->string('currency', 20)->nullable();
             $table->unsignedBigInteger('quantity')->nullable();
             $table->string('deleted_hint')->nullable()->comment("This is a hint for the deleted record");
+            $table->string('image')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

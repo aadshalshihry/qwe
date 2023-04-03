@@ -5611,3 +5611,4 @@ id,name,sku,price,currency,variations,quantity,status
 72356,رامن بنكهة الخضار ,,5,SAR,,9,deleted
 72357,رامن بنكهة الدجاج ,,8,SAR,,9,deleted
 73,ON أمينو انرجي,sukforme,120,SAR,"[{""name"":""\u0627\u0644\u062d\u062c\u0645"",""value"":""\u0663\u0660 \u062c\u0631\u0639\u0647""},{""name"":""\u0627\u0644\u0646\u0643\u0647\u0647"",""value"":""\u0627\u0644\u062a\u0648\u062a \u0627\u0644\u0623\u0632\u0631\u0642, \u0627\u0644\u0641\u0648\u0627\u0643\u0647, \u0627\u0644\u0639\u0646\u0628""}]",7,sale
+72358,Sleek Fresh Keyboard,mysku2,10,SAR,"[{""name"": ""color"", ""value"": ""indigo""},{""name"": ""material"", ""value"": ""Soft""}]",5,sale

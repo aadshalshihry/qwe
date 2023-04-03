@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Console\Commands\DeleteOutdatedProducts;
+use App\Console\Commands\ImportProductExternalApi;
 use App\Console\Commands\ImportProducts;
 use App\Console\Commands\ImportProductsWithProgressBar;
 use Illuminate\Console\Scheduling\Schedule;
@@ -18,6 +19,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         ImportProductsWithProgressBar::class,
         DeleteOutdatedProducts::class,
+        ImportProductExternalApi::class
     ];
 
     /**
@@ -30,6 +32,10 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
+
+        $schedule
+            ->command("import:product-external-api")
+            ->dailyAt('00:00');
     }
 
     /**
